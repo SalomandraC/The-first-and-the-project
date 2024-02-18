@@ -1,0 +1,13 @@
+canvas {
+    border: rgb(212, 39, 39) 2px solid;
+}
+
+.container_row {
+    display: flex;
+    flex-direction: row;
+}
+
+.info {
+    border: rgb(17, 190, 233) 2px solid;
+    background: rgb(247, 208, 240);
+}

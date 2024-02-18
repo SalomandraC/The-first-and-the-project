@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рисовашка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+
+
+    <!-- Load TensorFlow.js. This is required to use MobileNet. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.1"> </script>
+    <!-- Load the MobileNet model. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"> </script>
+
+    <!-- Replace this with your image. Make sure CORS settings allow reading the image! -->
+
+    <canvas id="canvas" width="500px" height="300px"></canvas>
+    <img id="img" src="dataset/1.png" height="300px"></img>
+    <br>
+    <input type="color" id="colorInput">
+    <input type="range" id="size">
+    <button id="check" onclick="check()">Проверка</button>
+    <div class="container_row">
+        <div id="predInfo2" class="info"></div>
+    </div>
+    <!-- Place your code in the script tag below. You can also use an external .js file -->
+    <script>
+        // Notice there is no 'import' statement. 'mobilenet' and 'tf' is
+        // available on the index-page because of the script tag above.
+        let imageNum = 1;
+        let radius = 5;
+        const img = document.getElementById('img');
+        let canvas = document.getElementById("canvas");
+
+        let scoreDiv = document.getElementById("score");
+        let colorInput = document.getElementById("colorInput");
+        let size = document.getElementById("size");
+        size.value = 5;
+
+        let ctx = canvas.getContext("2d");
+        let drawing = false;
+
+        canvas.addEventListener("mousedown", () => {
+            drawing = true;
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            drawing = false;
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            if (drawing) {
+                ctx.beginPath();
+                ctx.ellipse(e.pageX - 10, e.pageY - 5, radius, radius, 0,
+                    0, Math.PI * 2, 0);
+                ctx.fill();
+            }
+        });
+
+        colorInput.addEventListener("change", () => {
+            let color = colorInput.value;
+            ctx.fillStyle = color;
+        })
+
+        size.addEventListener("change", () => {
+            radius = size.value;
+        })
+
+        function predict() {
+            let name = "";
+            mobilenet.load().then(model => {
+                // Classify the image.
+                let predictions1 = [], predictions2 = [];
+                model.classify(img, 100).then(predictions => { 
+                    let classname = predictions[1].className;
+                    let probability = predictions[1].probability;
+                });
+                model.classify(canvas, 100).then(predictions => {
+                    let text = "";
+                    let classnam = predictions[1].className;
+                    let probability = predictions[1].probability;
+                    text += `${classnam}: ${probability}`
+                    predInfo2.innerHTML = text;
+                    name += `${classnam}`
+                    img.src = "dataset/" + name + ".jpg";
+                });
+            });
+            }
+        function check() {   
+            predict()
+            
+        }
+
+    </script>
+
+</body>
+</html>
